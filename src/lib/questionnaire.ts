@@ -3,7 +3,9 @@
  *
  * The public form, the review screen, server-side validation, the admin detail
  * view and the CSV export are all driven by this file. Question ids (q1…q38)
- * are stable identifiers stored in the database — do not renumber them.
+ * and option values are stable identifiers stored in the database — do not
+ * renumber or rename them. Labels (shown to people) are in Roman Urdu and can
+ * be edited freely.
  */
 
 export const SCHEMA_VERSION = 1;
@@ -11,8 +13,8 @@ export const SCHEMA_VERSION = 1;
 export type Special = "dont_know" | "declined";
 
 export const SPECIAL_LABELS: Record<Special, string> = {
-  dont_know: "Maloom nahi (Don't know)",
-  declined: "Declined",
+  dont_know: "Maloom nahi",
+  declined: "Jawab dene se inkaar",
 };
 
 export type Option = { value: string; label: string };
@@ -85,45 +87,33 @@ export type Section = {
 
 /** "Other" option value — selecting it reveals a free-text field. */
 export const OTHER = "other";
+export const OTHER_LABEL = "Deegar";
 
-const opt = (label: string, value?: string): Option => ({
-  label,
-  value:
-    value ??
-    label
-      .toLowerCase()
-      .replace(/[–—]/g, "-")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_|_$/g, ""),
-});
+/** Option with an explicit, stable database value. */
+const opt = (label: string, value: string): Option => ({ label, value });
 
-const other = opt("Other", OTHER);
-
-const FREQUENCY_SHORT = [
-  opt("Daily"),
-  opt("Weekly"),
-  opt("Monthly"),
-  opt("Occasionally"),
-  opt("Rarely"),
-];
+const other = opt(OTHER_LABEL, OTHER);
+const YES = opt("Haan", "yes");
+const NO = opt("Nahi", "no");
+const OPTIONAL_EXPLAIN = { label: "Mazeed wazahat (ikhtiyari)" };
 
 export const CAMPUS_OPTIONS: Option[] = [
   opt("Ring Road Campus", "ring_road"),
   opt("Kabootar Chowk Preschool", "kabootar_chowk"),
-  opt("Both campuses", "both"),
+  opt("Dono campus", "both"),
 ];
 
 export const SECTIONS: Section[] = [
   {
     id: "basic",
-    title: "Basic Organization Information",
-    purpose: "A little context about you and the campus you are describing.",
+    title: "Idare ki Bunyadi Maloomat",
+    purpose: "Aap ke baare mein aur us campus ke baare mein thori si maloomat jis ka aap zikr kar rahe hain.",
     questions: [
       {
         id: "q1",
         number: 1,
         type: "single",
-        prompt: "Which campus are you answering questions about?",
+        prompt: "Aap kis campus ke baare mein jawab de rahe hain?",
         required: true,
         specials: [],
         options: CAMPUS_OPTIONS,
@@ -132,15 +122,15 @@ export const SECTIONS: Section[] = [
         id: "q2",
         number: 2,
         type: "single",
-        prompt: "What is your current role?",
+        prompt: "Aap ka maujooda ohda (role) kya hai?",
         required: true,
         specials: ["declined"],
         options: [
-          opt("Principal"),
-          opt("Vice Principal"),
-          opt("Academic Coordinator"),
-          opt("Teacher"),
-          opt("Administrative Staff"),
+          opt("Principal", "principal"),
+          opt("Vice Principal", "vice_principal"),
+          opt("Academic Coordinator", "academic_coordinator"),
+          opt("Teacher (Ustad / Ustani)", "teacher"),
+          opt("Administrative Staff (Daftari amla)", "administrative_staff"),
           other,
         ],
       },
@@ -148,21 +138,21 @@ export const SECTIONS: Section[] = [
         id: "q3",
         number: 3,
         type: "single",
-        prompt: "How involved are you in the management of this campus?",
+        prompt: "Aap is campus ki management mein kis had tak shamil hain?",
         required: true,
         specials: [],
         options: [
-          opt("Directly involved in management", "direct"),
-          opt("Somewhat involved", "somewhat"),
-          opt("Mostly involved in teaching or daily operations", "operations"),
-          opt("Not directly involved in management", "not_involved"),
+          opt("Management mein seedha shamil hoon", "direct"),
+          opt("Kuch had tak shamil hoon", "somewhat"),
+          opt("Zyada tar parhane ya rozmarra ke kaam mein shamil hoon", "operations"),
+          opt("Management mein seedha shamil nahi hoon", "not_involved"),
         ],
       },
       {
         id: "q4",
         number: 4,
         type: "single",
-        prompt: "Approximately how many employees work at this campus?",
+        prompt: "Is campus mein taqreeban kitne mulazimeen kaam karte hain?",
         dropdown: true,
         options: [
           opt("1–10", "1-10"),
@@ -170,19 +160,19 @@ export const SECTIONS: Section[] = [
           opt("21–30", "21-30"),
           opt("31–40", "31-40"),
           opt("41–50", "41-50"),
-          opt("More than 50", "50+"),
+          opt("50 se zyada", "50+"),
         ],
       },
       {
         id: "q5",
         number: 5,
         type: "single",
-        prompt: "How familiar are you with the overall management structure?",
+        prompt: "Aap management ke majmooi dhaanche (structure) se kitna waqif hain?",
         options: [
-          opt("Very familiar", "very"),
-          opt("Somewhat familiar", "somewhat"),
-          opt("Slightly familiar", "slightly"),
-          opt("Not familiar", "not"),
+          opt("Bohat achi tarah waqif hoon", "very"),
+          opt("Kuch had tak waqif hoon", "somewhat"),
+          opt("Thora sa waqif hoon", "slightly"),
+          opt("Waqif nahi hoon", "not"),
         ],
       },
     ],
@@ -190,24 +180,24 @@ export const SECTIONS: Section[] = [
   {
     id: "f1",
     code: "F1",
-    title: "Division of Work",
-    purpose: "How work is divided among departments or groups.",
+    title: "Kaam ki Taqseem",
+    purpose: "Kaam mukhtalif shobon (departments) ya groups mein kaise taqseem kiya jata hai.",
     questions: [
       {
         id: "q6",
         number: 6,
         type: "multi",
-        prompt: "What departments or main working groups exist at this campus?",
-        help: "Select all that apply.",
+        prompt: "Is campus mein kaun kaun se shobe (departments) ya kaam karne wale bare groups maujood hain?",
+        help: "Jitne bhi lagu hon, sab muntakhib karein.",
         options: [
-          opt("Administration"),
-          opt("Teaching Staff"),
-          opt("Academic Coordination"),
-          opt("Accounts and Fee Management", "accounts"),
-          opt("Admissions"),
-          opt("Examination and Assessment", "examination"),
-          opt("Support Staff"),
-          opt("Security"),
+          opt("Administration (Intezamia)", "administration"),
+          opt("Teaching Staff (Tadreesi amla)", "teaching_staff"),
+          opt("Academic Coordination", "academic_coordination"),
+          opt("Accounts aur Fee ka intezam", "accounts"),
+          opt("Admissions (Dakhlay)", "admissions"),
+          opt("Imtihanaat aur Assessment", "examination"),
+          opt("Support Staff (Maawin amla)", "support_staff"),
+          opt("Security (Hifazat)", "security"),
           other,
         ],
       },
@@ -215,30 +205,30 @@ export const SECTIONS: Section[] = [
         id: "q7",
         number: 7,
         type: "repeater",
-        prompt: "Approximately how many employees work in each department?",
-        help: "Add one row per department. Approximate numbers are fine.",
-        addLabel: "Add department",
+        prompt: "Har shobe mein taqreeban kitne mulazimeen kaam karte hain?",
+        help: "Har shobe ke liye ek line add karein. Andaazan tadaad kaafi hai.",
+        addLabel: "Shoba add karein",
         seedFrom: "q6",
         fields: [
-          { key: "department", label: "Department name", input: "text" },
-          { key: "count", label: "Approx. employees", input: "number" },
+          { key: "department", label: "Shobe ka naam", input: "text" },
+          { key: "count", label: "Andaazan mulazimeen", input: "number" },
         ],
       },
       {
         id: "q8",
         number: 8,
         type: "repeater",
-        prompt: "Who is responsible for managing each department or group?",
-        help: "Give the person's role or title, not their name.",
-        addLabel: "Add department",
+        prompt: "Har shobe ya group ka intezam kis ke zimme hai?",
+        help: "Shakhs ka naam nahi, sirf un ka ohda likhein.",
+        addLabel: "Shoba add karein",
         seedFrom: "q6",
         fields: [
-          { key: "department", label: "Department", input: "text" },
+          { key: "department", label: "Shoba", input: "text" },
           {
             key: "role",
-            label: "Responsible person's role",
+            label: "Zimmedar shakhs ka ohda",
             input: "text",
-            placeholder: "e.g. Vice Principal",
+            placeholder: "maslan Vice Principal",
           },
         ],
       },
@@ -246,86 +236,82 @@ export const SECTIONS: Section[] = [
         id: "q9",
         number: 9,
         type: "single",
-        prompt: "Does each department have a separate supervisor or manager?",
-        options: [opt("Yes"), opt("No"), opt("Some departments do", "some")],
-        explain: { label: "Additional explanation (optional)" },
+        prompt: "Kya har shobe ka alag supervisor ya manager hai?",
+        options: [YES, NO, opt("Kuch shobon ka hai", "some")],
+        explain: OPTIONAL_EXPLAIN,
       },
     ],
   },
   {
     id: "f2",
     code: "F2",
-    title: "Span of Control",
-    purpose:
-      "How many employees report directly to managers at different levels.",
-    note: "Count only direct reporting relationships — people who report straight to that manager — not everyone working under them indirectly.",
+    title: "Nigrani ka Daira (Span of Control)",
+    purpose: "Mukhtalif darjon ke managers ko kitne mulazimeen seedha report karte hain.",
+    note: "Sirf seedhi reporting ginein — yani woh log jo seedha usi manager ko report karte hain — un ke neeche kaam karne wale tamam logon ko nahi.",
     questions: [
       {
         id: "q10",
         number: 10,
         type: "number",
-        prompt:
-          "Approximately how many employees report directly to the campus principal or head?",
-        unit: "employees",
+        prompt: "Campus ke principal ya head ko taqreeban kitne mulazimeen seedha report karte hain?",
+        unit: "mulazimeen",
       },
       {
         id: "q11",
         number: 11,
         type: "number",
         prompt:
-          "Approximately how many employees report directly to the academic coordinator or teacher supervisor?",
-        unit: "employees",
+          "Academic coordinator ya teacher supervisor ko taqreeban kitne mulazimeen seedha report karte hain?",
+        unit: "mulazimeen",
       },
       {
         id: "q12",
         number: 12,
         type: "single",
         prompt:
-          "How many management levels exist between ordinary employees and the person responsible for the campus?",
+          "Aam mulazimeen aur campus ke zimmedar shakhs ke darmiyan management ke kitne darje (levels) hain?",
         options: [
-          opt("One level", "1"),
-          opt("Two levels", "2"),
-          opt("Three levels", "3"),
-          opt("More than three levels", "4+"),
+          opt("Ek darja", "1"),
+          opt("Do darje", "2"),
+          opt("Teen darje", "3"),
+          opt("Teen se zyada darje", "4+"),
         ],
-        explain: { label: "Additional explanation (optional)" },
+        explain: OPTIONAL_EXPLAIN,
       },
     ],
   },
   {
     id: "f3",
     code: "F3",
-    title: "Decision-Making",
-    purpose:
-      "Which decisions can be made independently and which require approval.",
+    title: "Faisla Sazi",
+    purpose: "Kaun se faisle khud kiye ja sakte hain aur kin ke liye manzoori leni parti hai.",
     questions: [
       {
         id: "q13",
         number: 13,
         type: "longtext",
         prompt:
-          "Give one example of a decision that a campus manager or department head can make without asking higher management for approval.",
-        placeholder: "Describe a real example…",
+          "Kisi aise faisle ki ek misaal dein jo campus manager ya shobe ka sarbarah upar wali management se poochay baghair kar sakta hai.",
+        placeholder: "Koi haqeeqi misaal likhein…",
       },
       {
         id: "q14",
         number: 14,
         type: "longtext",
-        prompt:
-          "Give one example of a decision that requires approval from higher management.",
-        placeholder: "Describe a real example…",
+        prompt: "Kisi aise faisle ki ek misaal dein jis ke liye upar wali management ki manzoori zaroori hoti hai.",
+        placeholder: "Koi haqeeqi misaal likhein…",
       },
       {
         id: "q15",
         number: 15,
         type: "fields",
-        prompt: "Who usually makes the final decision regarding the following?",
-        help: "Enter the responsible person's role for each item. Leave blank if unsure.",
+        prompt: "Neeche diye gaye maamlaat mein aam tor par aakhri faisla kaun karta hai?",
+        help: "Har maamle ke liye zimmedar shakhs ka ohda likhein. Agar yaqeen na ho to khali chhor dein.",
         fields: [
-          { key: "hiring", label: "Hiring new employees", input: "text" },
-          { key: "salary", label: "Salary changes", input: "text" },
-          { key: "expenses", label: "Major expenses", input: "text" },
-          { key: "academic", label: "Important academic decisions", input: "text" },
+          { key: "hiring", label: "Naye mulazimeen ki bharti", input: "text" },
+          { key: "salary", label: "Tankhwah mein tabdeeli", input: "text" },
+          { key: "expenses", label: "Bare akhrajaat", input: "text" },
+          { key: "academic", label: "Ahem taleemi (academic) faisle", input: "text" },
         ],
       },
     ],
@@ -333,26 +319,24 @@ export const SECTIONS: Section[] = [
   {
     id: "f4",
     code: "F4",
-    title: "Performance Measurement",
-    purpose:
-      "How the organization measures employee and organizational performance.",
+    title: "Karkardagi ki Jaanch",
+    purpose: "Idara mulazimeen aur apni majmooi karkardagi ko kaise jaanchta hai.",
     questions: [
       {
         id: "q16",
         number: 16,
         type: "multi",
-        prompt:
-          "What things does the school regularly monitor to evaluate performance?",
-        help: "Select all that apply.",
+        prompt: "School karkardagi jaanchne ke liye baqaidagi se kin cheezon ki nigrani karta hai?",
+        help: "Jitne bhi lagu hon, sab muntakhib karein.",
         options: [
-          opt("Student attendance"),
-          opt("Teacher attendance"),
-          opt("Fee collection"),
-          opt("New admissions"),
-          opt("Examination results"),
-          opt("Teacher performance"),
-          opt("Parent complaints"),
-          opt("Student academic progress"),
+          opt("Talaba ki haazri", "student_attendance"),
+          opt("Asatiza ki haazri", "teacher_attendance"),
+          opt("Fee ki wasooli", "fee_collection"),
+          opt("Naye dakhlay", "new_admissions"),
+          opt("Imtihani nataij", "examination_results"),
+          opt("Asatiza ki karkardagi", "teacher_performance"),
+          opt("Walidain ki shikayaat", "parent_complaints"),
+          opt("Talaba ki taleemi taraqqi", "student_academic_progress"),
           other,
         ],
       },
@@ -360,14 +344,14 @@ export const SECTIONS: Section[] = [
         id: "q17",
         number: 17,
         type: "single",
-        prompt: "How frequently are these performance indicators reviewed?",
+        prompt: "In karkardagi ke ishariyon (indicators) ka jaiza kitni baar liya jata hai?",
         options: [
-          opt("Daily"),
-          opt("Weekly"),
-          opt("Monthly"),
-          opt("Every term", "term"),
-          opt("Annually"),
-          opt("Only when a problem occurs", "on_problem"),
+          opt("Rozana", "daily"),
+          opt("Haftawar", "weekly"),
+          opt("Mahana", "monthly"),
+          opt("Har term mein", "term"),
+          opt("Saalana", "annually"),
+          opt("Sirf jab koi masla ho", "on_problem"),
           other,
         ],
       },
@@ -375,13 +359,12 @@ export const SECTIONS: Section[] = [
         id: "q18",
         number: 18,
         type: "longtext",
-        prompt:
-          "Who checks performance, and what happens when performance is unsatisfactory?",
+        prompt: "Karkardagi kaun check karta hai, aur jab karkardagi tasalli bakhsh na ho to kya hota hai?",
         hints: [
-          "Who monitors performance?",
-          "What happens when a problem is identified?",
-          "Is feedback provided?",
-          "Are corrective actions taken?",
+          "Karkardagi ki nigrani kaun karta hai?",
+          "Masla saamne aane par kya hota hai?",
+          "Kya feedback di jati hai?",
+          "Kya islahi iqdamaat kiye jate hain?",
         ],
       },
     ],
@@ -389,29 +372,29 @@ export const SECTIONS: Section[] = [
   {
     id: "f5",
     code: "F5",
-    title: "Recruitment",
-    purpose: "The actual recruitment process used by the organization.",
+    title: "Bharti (Recruitment)",
+    purpose: "Idare mein bharti ka asal tareeqa-e-kaar.",
     questions: [
       {
         id: "q19",
         number: 19,
         type: "longtext",
         prompt:
-          "Think about the most recent employee hired at this campus. Describe the recruitment process in the order it happened.",
-        help: "Please describe what actually happened, not the ideal or official process.",
-        placeholder: "First… then… finally…",
+          "Is campus mein sab se haal hi mein bharti hone wale mulazim ke baare mein sochein. Bharti ka amal usi tarteeb se bayan karein jis mein woh hua.",
+        help: "Barah-e-meharbani woh batayein jo asal mein hua, na ke mithali ya sarkari tareeqa.",
+        placeholder: "Pehle… phir… aakhir mein…",
       },
       {
         id: "q20",
         number: 20,
         type: "single",
-        prompt: "How was the candidate initially found?",
+        prompt: "Umeedwar shuru mein kaise mila?",
         options: [
-          opt("Online job advertisement", "online_ad"),
-          opt("Personal reference"),
-          opt("Existing employee recommendation", "employee_referral"),
-          opt("Walk-in applicant", "walk_in"),
-          opt("Direct contact"),
+          opt("Online naukri ka ishtehar", "online_ad"),
+          opt("Zaati hawala (reference)", "personal_reference"),
+          opt("Maujooda mulazim ki sifarish", "employee_referral"),
+          opt("Khud aa kar darkhwast di (walk-in)", "walk_in"),
+          opt("Seedha raabta", "direct_contact"),
           other,
         ],
       },
@@ -419,17 +402,16 @@ export const SECTIONS: Section[] = [
         id: "q21",
         number: 21,
         type: "multi",
-        prompt:
-          "Which of the following steps were involved in the recruitment process?",
-        help: "Select all that apply.",
+        prompt: "Bharti ke amal mein in mein se kaun se marahil shamil the?",
+        help: "Jitne bhi lagu hon, sab muntakhib karein.",
         options: [
-          opt("CV screening"),
-          opt("Initial interview"),
-          opt("Teaching demonstration"),
-          opt("Subject knowledge test"),
-          opt("Reference checking"),
-          opt("Final interview"),
-          opt("Management approval"),
+          opt("CV ki jaanch", "cv_screening"),
+          opt("Ibtidai interview", "initial_interview"),
+          opt("Teaching demonstration (parha kar dikhana)", "teaching_demonstration"),
+          opt("Mazmoon ki maloomat ka test", "subject_knowledge_test"),
+          opt("References ki tasdeeq", "reference_checking"),
+          opt("Aakhri interview", "final_interview"),
+          opt("Management ki manzoori", "management_approval"),
           other,
         ],
       },
@@ -437,32 +419,32 @@ export const SECTIONS: Section[] = [
         id: "q22",
         number: 22,
         type: "longtext",
-        prompt: "Who made the final hiring decision?",
-        help: "A role or title is enough, e.g. “Principal after approval from the regional office”.",
+        prompt: "Bharti ka aakhri faisla kis ne kiya?",
+        help: "Ohda batana kaafi hai, maslan “Regional office ki manzoori ke baad Principal”.",
       },
     ],
   },
   {
     id: "f6",
     code: "F6",
-    title: "Employee Management",
+    title: "Mulazimeen ka Intezam",
     purpose:
-      "How the organization manages, evaluates, motivates and retains employees.",
+      "Idara mulazimeen ka intezam, un ki karkardagi ka jaiza, hosla afzai aur unhein barqarar kaise rakhta hai.",
     questions: [
       {
         id: "q23",
         number: 23,
         type: "multi",
-        prompt: "How does the school evaluate employee performance?",
-        help: "Select all that apply.",
+        prompt: "School mulazimeen ki karkardagi ka jaiza kaise leta hai?",
+        help: "Jitne bhi lagu hon, sab muntakhib karein.",
         options: [
-          opt("Classroom observation"),
-          opt("Student examination results", "exam_results"),
-          opt("Employee attendance"),
-          opt("Parent feedback"),
-          opt("Principal evaluation"),
-          opt("Academic coordinator evaluation", "coordinator_evaluation"),
-          opt("Formal performance reviews"),
+          opt("Classroom ka mushahida (observation)", "classroom_observation"),
+          opt("Talaba ke imtihani nataij", "exam_results"),
+          opt("Mulazimeen ki haazri", "employee_attendance"),
+          opt("Walidain ki raaye", "parent_feedback"),
+          opt("Principal ka jaiza", "principal_evaluation"),
+          opt("Academic coordinator ka jaiza", "coordinator_evaluation"),
+          opt("Baqaida performance reviews", "formal_performance_reviews"),
           other,
         ],
       },
@@ -471,41 +453,40 @@ export const SECTIONS: Section[] = [
         number: 24,
         type: "longtext",
         prompt:
-          "What specific practices does the school use to motivate employees, retain good employees, improve performance, or manage employee pay?",
-        help: "Actual examples are most useful (e.g. “annual increment linked to observation scores”).",
+          "School mulazimeen ki hosla afzai, ache mulazimeen ko barqarar rakhne, karkardagi behtar banane ya tankhwah ke intezam ke liye kaun se khaas tareeqay istemal karta hai?",
+        help: "Haqeeqi misaalein sab se zyada mufeed hain (maslan “observation scores se munsalik saalana increment”).",
       },
     ],
   },
   {
     id: "partD",
     code: "Part D",
-    title: "Identifying an Organizational Problem",
+    title: "Idare ke Masle ki Nishandahi",
     purpose:
-      "One real operational problem and its possible causes. Factual examples are more useful than general opinions.",
+      "Ek haqeeqi amli masla aur us ki mumkina wujoohat. Aam raaye ke bajaye haqeeqi misaalein zyada mufeed hain.",
     questions: [
       {
         id: "q25",
         number: 25,
         type: "longtext",
-        prompt:
-          "What is one significant operational or management problem that currently affects this campus?",
+        prompt: "Koi ek ahem amli ya intezami masla kya hai jo is waqt is campus ko mutasir kar raha hai?",
       },
       {
         id: "q26",
         number: 26,
         type: "single",
-        prompt: "Which category best describes this problem?",
+        prompt: "Kaun si category is masle ko sab se behtar bayan karti hai?",
         dropdown: true,
         options: [
-          opt("Communication"),
-          opt("Staff management"),
-          opt("Workload distribution"),
-          opt("Decision-making", "decision_making"),
-          opt("Recruitment"),
-          opt("Employee performance"),
-          opt("Student management"),
-          opt("Parent communication"),
-          opt("Financial or resource limitations", "financial"),
+          opt("Raabta (Communication)", "communication"),
+          opt("Staff ka intezam", "staff_management"),
+          opt("Kaam ki taqseem (Workload)", "workload_distribution"),
+          opt("Faisla sazi", "decision_making"),
+          opt("Bharti", "recruitment"),
+          opt("Mulazimeen ki karkardagi", "employee_performance"),
+          opt("Talaba ka intezam", "student_management"),
+          opt("Walidain se raabta", "parent_communication"),
+          opt("Maali ya wasail ki kami", "financial"),
           other,
         ],
       },
@@ -513,33 +494,34 @@ export const SECTIONS: Section[] = [
         id: "q27",
         number: 27,
         type: "fields",
-        prompt:
-          "Can you describe a recent incident in which this problem affected the school's operations?",
+        prompt: "Kya aap haal hi ka koi waqia bayan kar sakte hain jis mein is masle ne school ke kaam ko mutasir kiya?",
         fields: [
-          { key: "what", label: "What happened?", input: "longtext" },
-          { key: "affected", label: "Who or what was affected?", input: "longtext" },
-          { key: "result", label: "What was the result?", input: "longtext" },
+          { key: "what", label: "Kya hua?", input: "longtext" },
+          { key: "affected", label: "Kaun ya kya mutasir hua?", input: "longtext" },
+          { key: "result", label: "Nateeja kya nikla?", input: "longtext" },
         ],
       },
       {
         id: "q28",
         number: 28,
         type: "single",
-        prompt: "How frequently does this problem occur?",
-        options: FREQUENCY_SHORT,
+        prompt: "Yeh masla kitni baar paish aata hai?",
+        options: [
+          opt("Rozana", "daily"),
+          opt("Haftawar", "weekly"),
+          opt("Mahana", "monthly"),
+          opt("Kabhi kabhar", "occasionally"),
+          opt("Shaz-o-naadir", "rarely"),
+        ],
       },
       {
         id: "q29",
         number: 29,
         type: "fields",
-        prompt: "What do you believe is the main reason behind this problem?",
+        prompt: "Aap ke khayal mein is masle ki asal wajah kya hai?",
         fields: [
-          { key: "main", label: "Main cause", input: "longtext" },
-          {
-            key: "alternative",
-            label: "Another possible explanation (if any)",
-            input: "longtext",
-          },
+          { key: "main", label: "Asal wajah", input: "longtext" },
+          { key: "alternative", label: "Koi aur mumkina wajah (agar ho)", input: "longtext" },
         ],
       },
     ],
@@ -547,40 +529,39 @@ export const SECTIONS: Section[] = [
   {
     id: "partE",
     code: "Part E",
-    title: "Recommendations",
-    purpose: "Information that can help develop a practical recommendation.",
+    title: "Tajaweez",
+    purpose: "Aisi maloomat jo ek qabil-e-amal tajweez tayyar karne mein madad de.",
     questions: [
       {
         id: "q30",
         number: 30,
         type: "single",
-        prompt: "Has the school previously tried to solve this problem?",
-        options: [opt("Yes"), opt("No")],
+        prompt: "Kya school ne pehle is masle ko hal karne ki koshish ki hai?",
+        options: [YES, NO],
         explainWhen: {
           value: "yes",
-          label: "What was attempted, and what happened?",
+          label: "Kya koshish ki gayi, aur us ka kya nateeja nikla?",
         },
       },
       {
         id: "q31",
         number: 31,
         type: "longtext",
-        prompt:
-          "What change or improvement do you think would help solve this problem?",
+        prompt: "Aap ke khayal mein kaun si tabdeeli ya behtari is masle ko hal karne mein madad degi?",
       },
       {
         id: "q32",
         number: 32,
         type: "multi",
-        prompt: "What resources would be required to implement this improvement?",
-        help: "Select all that apply.",
+        prompt: "Is behtari par amal ke liye kin wasail ki zaroorat hogi?",
+        help: "Jitne bhi lagu hon, sab muntakhib karein.",
         options: [
-          opt("Money"),
-          opt("Additional employees"),
-          opt("Staff training"),
-          opt("Software or technology", "technology"),
-          opt("Management time"),
-          opt("Better communication"),
+          opt("Paisa", "money"),
+          opt("Izafi mulazimeen", "additional_employees"),
+          opt("Staff ki training", "staff_training"),
+          opt("Software ya technology", "technology"),
+          opt("Management ka waqt", "management_time"),
+          opt("Behtar raabta", "better_communication"),
           other,
         ],
       },
@@ -588,63 +569,59 @@ export const SECTIONS: Section[] = [
         id: "q33",
         number: 33,
         type: "longtext",
-        prompt:
-          "What difficulties or disadvantages might arise from implementing this change?",
+        prompt: "Is tabdeeli par amal karne se kya mushkilat ya nuqsanaat paida ho sakte hain?",
       },
       {
         id: "q34",
         number: 34,
         type: "longtext",
-        prompt:
-          "How could the school measure whether the proposed improvement is successful?",
-        help: "Measurable indicators are best, e.g. “parent complaints fall from ~10 to under 4 per month”.",
+        prompt: "School kaise maloom kar sakta hai ke tajweez kardah behtari kamyab rahi?",
+        help: "Napne ke qabil isharay sab se behtar hain, maslan “walidain ki mahana shikayaat 10 se kam ho kar 4 se neeche aa jayein”.",
       },
     ],
   },
   {
     id: "partF",
     code: "Part F",
-    title: "Additional Findings",
+    title: "Izafi Mushahidaat",
     questions: [
       {
         id: "q35",
         number: 35,
         type: "longtext",
         prompt:
-          "Is there any information about the school's management that is difficult to find or is not formally recorded?",
+          "Kya school ki management ke baare mein koi aisi maloomat hai jo dhoondna mushkil ho ya baqaida record na ki jati ho?",
       },
       {
         id: "q36",
         number: 36,
         type: "longtext",
         prompt:
-          "Is there any management practice at this school that surprised you because it works differently from what you would normally expect?",
+          "Kya is school mein management ka koi aisa tareeqa hai jis ne aap ko hairan kiya, kyunke woh aap ki tawaqqo se mukhtalif tareeqay se kaam karta hai?",
       },
     ],
   },
   {
     id: "additional",
-    title: "Additional Information",
+    title: "Izafi Maloomat",
     questions: [
       {
         id: "q37",
         number: 37,
         type: "longtext",
         prompt:
-          "Is there anything else about the management or daily operations of this campus that you think is important?",
+          "Kya is campus ki management ya rozmarra ke kaam ke baare mein koi aur baat hai jo aap ke khayal mein ahem hai?",
       },
       {
         id: "q38",
         number: 38,
         type: "single",
-        prompt:
-          "Would you be willing to answer a short follow-up question if clarification is needed?",
+        prompt: "Agar wazahat ki zaroorat ho to kya aap ek mukhtasar follow-up sawal ka jawab dene ke liye tayyar honge?",
         specials: [],
-        options: [opt("Yes"), opt("No")],
+        options: [YES, NO],
         explainWhen: {
           value: "yes",
-          label:
-            "How may we contact you? (optional — phone or email; only the researcher will see this)",
+          label: "Hum aap se kaise raabta kar sakte hain? (ikhtiyari — phone ya email; yeh sirf researcher dekhega)",
         },
       },
     ],
@@ -715,6 +692,8 @@ export function optionLabel(q: Question, value: string): string {
   return q.options.find((o) => o.value === value)?.label ?? value;
 }
 
+const otherText = (a: Answer) => `${OTHER_LABEL}: ${a.other ?? ""}`;
+
 /** Flatten an answer into a single human-readable string (review + CSV). */
 export function formatAnswer(q: Question, a: Answer | undefined): string {
   if (!a) return "";
@@ -724,16 +703,14 @@ export function formatAnswer(q: Question, a: Answer | undefined): string {
   switch (q.type) {
     case "single":
       if (typeof v === "string" && v) {
-        parts.push(
-          v === OTHER && a.other ? `Other: ${a.other}` : optionLabel(q, v),
-        );
+        parts.push(v === OTHER && a.other ? otherText(a) : optionLabel(q, v));
       }
       break;
     case "multi":
       if (Array.isArray(v)) {
         parts.push(
           (v as string[])
-            .map((x) => (x === OTHER && a.other ? `Other: ${a.other}` : optionLabel(q, x)))
+            .map((x) => (x === OTHER && a.other ? otherText(a) : optionLabel(q, x)))
             .join("; "),
         );
       }

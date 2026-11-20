@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { requireAdmin } from "@/lib/auth";
-import { CAMPUS_OPTIONS, QUESTION_BY_ID, STATUS_OPTIONS, campusLabel, optionLabel } from "@/lib/questionnaire";
+import {
+  CAMPUS_OPTIONS,
+  QUESTION_BY_ID,
+  SPECIAL_LABELS,
+  STATUS_OPTIONS,
+  campusLabel,
+  optionLabel,
+} from "@/lib/questionnaire";
 import {
   PAGE_SIZE,
   filtersToSearch,
@@ -163,7 +170,7 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
 
 function roleLabel(role: string) {
   if (role.startsWith("other: ")) return role.slice(7) || "Other";
-  if (role === "declined") return "Declined";
+  if (role === "declined") return SPECIAL_LABELS.declined;
   return optionLabel(QUESTION_BY_ID.q2, role);
 }
 

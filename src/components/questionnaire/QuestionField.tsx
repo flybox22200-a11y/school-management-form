@@ -91,7 +91,7 @@ export function QuestionField({ question: q, answer, allAnswers, error, onChange
 
         {specialsFor(q).length > 0 && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-ink-faint">Can&apos;t answer?</span>
+            <span className="text-xs text-ink-faint">Jawab nahi de sakte?</span>
             {specialsFor(q).map((s) => (
               <button
                 key={s}
@@ -152,7 +152,7 @@ function Input({ q, a, set, allAnswers, uid }: InputProps) {
       return (
         <LongText
           value={(a.value as string) ?? ""}
-          placeholder={q.placeholder ?? "Type your answer…"}
+          placeholder={q.placeholder ?? "Apna jawab likhein…"}
           onChange={(v) => set({ value: v })}
         />
       );
@@ -218,11 +218,11 @@ function OtherText({ a, set }: { a: Answer; set: InputProps["set"] }) {
       type="text"
       autoFocus
       className={`${inputBase} mt-3`}
-      placeholder="Please specify…"
+      placeholder="Wazahat karein…"
       maxLength={LIMITS.shortText}
       value={a.other ?? ""}
       onChange={(e) => set({ other: e.target.value })}
-      aria-label="Please specify other"
+      aria-label="Deegar ki wazahat"
     />
   );
 }
@@ -240,7 +240,7 @@ function SingleInput({ q, a, set, uid }: Omit<InputProps, "allAnswers"> & { q: E
           onChange={(e) => set({ value: e.target.value })}
           aria-label={q.prompt}
         >
-          <option value="">Select…</option>
+          <option value="">Muntakhib karein…</option>
           {q.options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
@@ -425,8 +425,7 @@ function RepeaterInput({
           onClick={fillFromSeed}
           className="justify-self-start rounded-lg border border-dashed border-accent/50 bg-accent-soft px-3 py-2 text-sm font-medium text-accent-ink transition hover:border-accent"
         >
-          ↳ Add the {seedLabels.length} department{seedLabels.length > 1 ? "s" : ""} you selected in Q
-          {q.seedFrom!.slice(1)}
+          ↳ Q{q.seedFrom!.slice(1)} mein muntakhib kiye gaye {seedLabels.length} shobe yahan add karein
         </button>
       )}
       {shown.map((row, i) => (
@@ -445,9 +444,9 @@ function RepeaterInput({
             onClick={() => remove(i)}
             disabled={shown.length === 1 && !Object.values(row).some((x) => x.trim())}
             className="h-10 rounded-lg px-3 text-sm text-ink-soft transition hover:bg-white hover:text-danger disabled:invisible"
-            aria-label={`Remove row ${i + 1}`}
+            aria-label={`Line ${i + 1} hatayein`}
           >
-            Remove
+            Hatayein
           </button>
         </div>
       ))}

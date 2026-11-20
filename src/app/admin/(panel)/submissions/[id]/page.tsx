@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { requireAdmin } from "@/lib/auth";
 import {
   OTHER,
+  OTHER_LABEL,
   SECTIONS,
   SPECIAL_LABELS,
   campusLabel,
@@ -121,7 +122,7 @@ function AnswerView({ q, a }: { q: Question; a: Answer | undefined }) {
       const v = a.value as string;
       return (
         <>
-          {v ? (v === OTHER ? `Other: ${a.other ?? ""}` : optionLabel(q, v)) : <Empty />}
+          {v ? (v === OTHER ? `${OTHER_LABEL}: ${a.other ?? ""}` : optionLabel(q, v)) : <Empty />}
           {explain}
         </>
       );
@@ -133,7 +134,7 @@ function AnswerView({ q, a }: { q: Question; a: Answer | undefined }) {
         <ul className="flex flex-wrap gap-1.5">
           {vs.map((v) => (
             <li key={v} className="rounded-md border border-line bg-paper px-2 py-0.5 text-sm">
-              {v === OTHER ? `Other: ${a.other ?? ""}` : optionLabel(q, v)}
+              {v === OTHER ? `${OTHER_LABEL}: ${a.other ?? ""}` : optionLabel(q, v)}
             </li>
           ))}
         </ul>

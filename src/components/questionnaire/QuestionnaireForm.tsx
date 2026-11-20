@@ -233,7 +233,7 @@ export function QuestionnaireForm() {
             {section.purpose && <p className="mt-2 max-w-2xl text-[15px] text-ink-soft">{section.purpose}</p>}
             {section.note && (
               <p className="mt-4 rounded-xl border-l-4 border-gold bg-gold-soft px-4 py-3 text-sm text-ink">
-                <strong className="font-semibold">Important: </strong>
+                <strong className="font-semibold">Ahem: </strong>
                 {section.note}
               </p>
             )}
@@ -241,7 +241,7 @@ export function QuestionnaireForm() {
 
           {Object.keys(errors).length > 0 && (
             <p role="alert" className="mb-4 rounded-xl border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">
-              Please complete the highlighted question{Object.keys(errors).length > 1 ? "s" : ""} before continuing.
+              Aage barhne se pehle nishan zada sawal mukammal karein.
             </p>
           )}
 
@@ -358,7 +358,7 @@ function Review({
                       {q.prompt}
                     </dt>
                     <dd className={`whitespace-pre-line text-sm ${text ? "text-ink" : "italic text-ink-faint"}`}>
-                      {text || "Not answered"}
+                      {text || "Jawab nahi diya"}
                     </dd>
                   </div>
                 );

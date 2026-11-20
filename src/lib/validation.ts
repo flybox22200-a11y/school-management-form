@@ -28,27 +28,27 @@ const str = (x: unknown, max: number): string =>
  */
 export function validateQuestion(q: Question, a: Answer | undefined): string | null {
   if (!isAnswered(q, a)) {
-    return q.required ? "Please answer this question." : null;
+    return q.required ? "Barah-e-meharbani is sawal ka jawab dein." : null;
   }
   if (!a || a.special) return null;
 
   const v = a.value;
   if (q.type === "single" && v === OTHER && !a.other?.trim()) {
-    return "Please specify “Other”.";
+    return "Barah-e-meharbani “Deegar” ki wazahat karein.";
   }
   if (q.type === "multi" && Array.isArray(v) && (v as string[]).includes(OTHER) && !a.other?.trim()) {
-    return "Please specify “Other”.";
+    return "Barah-e-meharbani “Deegar” ki wazahat karein.";
   }
   if (q.type === "number" && typeof v === "string") {
-    if (!/^\d+$/.test(v.trim())) return "Please enter a whole number (0 or more).";
-    if (Number(v) > LIMITS.maxNumber) return "That number looks too large.";
+    if (!/^\d+$/.test(v.trim())) return "Barah-e-meharbani poora adad likhein (0 ya us se zyada).";
+    if (Number(v) > LIMITS.maxNumber) return "Yeh adad bohat bara lagta hai.";
   }
   if (q.type === "repeater" && Array.isArray(v)) {
     for (const row of v as RepeaterRow[]) {
       for (const f of q.fields) {
         const cell = row[f.key]?.trim();
         if (f.input === "number" && cell && !/^\d+$/.test(cell)) {
-          return `“${f.label}” must be a whole number.`;
+          return `“${f.label}” mein poora adad likhein.`;
         }
       }
     }

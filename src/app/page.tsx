@@ -74,8 +74,8 @@ export default function Home() {
                 ))}
               </ul>
               <p className="mt-6 text-sm leading-relaxed text-ink-soft">
-                If you don&apos;t know an answer, choose <strong className="text-ink">Maloom nahi (Don&apos;t know)</strong>.
-                If you prefer not to answer, choose <strong className="text-ink">Declined</strong>. Please don&apos;t
+                If you don&apos;t know an answer, choose <strong className="text-ink">Maloom nahi</strong>. If you
+                prefer not to answer, choose <strong className="text-ink">Jawab dene se inkaar</strong>. Please don&apos;t
                 guess — an honest &ldquo;don&apos;t know&rdquo; is more useful than an invented answer.
               </p>
             </div>

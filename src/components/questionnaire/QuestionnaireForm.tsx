@@ -91,7 +91,8 @@ export function QuestionnaireForm() {
     requestAnimationFrame(() => {
       const el = document.getElementById(`question-${first}`);
       el?.scrollIntoView({ behavior: "smooth", block: "start" });
-      el?.querySelector<HTMLElement>("input,textarea,select,button")?.focus({ preventScroll: true });
+      // Focus the question box, not an input, so phones don't pop up the keyboard.
+      el?.focus({ preventScroll: true });
     });
   };
 
@@ -227,7 +228,7 @@ export function QuestionnaireForm() {
             {section.code && (
               <p className="font-mono text-xs font-medium uppercase tracking-[0.14em] text-accent">{section.code}</p>
             )}
-            <h2 id={`sec-${section.id}`} className="mt-1 font-serif text-[28px] leading-tight text-ink sm:text-3xl">
+            <h2 id={`sec-${section.id}`} className="mt-1 font-serif text-[26px] leading-tight text-ink sm:text-3xl">
               {section.title}
             </h2>
             {section.purpose && <p className="mt-2 max-w-2xl text-[15px] text-ink-soft">{section.purpose}</p>}
@@ -269,12 +270,13 @@ export function QuestionnaireForm() {
       )}
 
       {/* Navigation */}
-      <nav className="mt-8 flex items-center justify-between gap-3 border-t border-line pt-6">
+      {/* On phones this bar sticks to the bottom so Next is always within thumb reach. */}
+      <nav className="sticky bottom-0 z-20 -mx-4 mt-8 flex items-center justify-between gap-3 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:pt-6 sm:pb-0 sm:backdrop-blur-none">
         <button
           type="button"
           onClick={() => goTo(step - 1)}
           disabled={step === 0 || pending}
-          className="rounded-xl px-4 py-3 text-[15px] font-medium text-ink-soft transition hover:bg-white hover:text-ink disabled:invisible"
+          className="shrink-0 rounded-xl px-3 py-3 text-[15px] font-medium text-ink-soft transition hover:bg-white hover:text-ink disabled:invisible sm:px-4"
         >
           ← Previous
         </button>
@@ -282,7 +284,7 @@ export function QuestionnaireForm() {
           <button
             type="button"
             onClick={next}
-            className="rounded-xl bg-ink px-6 py-3 text-[15px] font-medium text-white shadow-sm transition hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink/20"
+            className="flex-1 rounded-xl bg-ink px-6 py-3.5 text-[15px] font-medium text-white shadow-sm transition hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink/20 active:scale-[0.99] sm:flex-none sm:py-3"
           >
             {step === REVIEW - 1 ? "Review answers" : "Next"} →
           </button>
@@ -291,7 +293,7 @@ export function QuestionnaireForm() {
             type="button"
             onClick={submit}
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-[15px] font-medium text-white shadow-sm transition hover:bg-accent-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/25 disabled:opacity-70"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-[15px] font-medium text-white shadow-sm transition hover:bg-accent-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/25 active:scale-[0.99] disabled:opacity-70 sm:flex-none sm:py-3"
           >
             {pending && (
               <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -357,7 +359,7 @@ function Review({
                       <span className="mr-1.5 font-mono text-xs text-ink-faint">Q{q.number}</span>
                       {q.prompt}
                     </dt>
-                    <dd className={`whitespace-pre-line text-sm ${text ? "text-ink" : "italic text-ink-faint"}`}>
+                    <dd className={`whitespace-pre-line text-sm [overflow-wrap:anywhere] ${text ? "text-ink" : "italic text-ink-faint"}`}>
                       {text || "Jawab nahi diya"}
                     </dd>
                   </div>
@@ -368,12 +370,12 @@ function Review({
         ))}
       </div>
 
-      <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-white p-5 text-[15px] text-ink">
+      <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-white p-4 text-[15px] text-ink sm:p-5">
         <input
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
-          className="mt-1 size-4 shrink-0 accent-[var(--color-accent)]"
+          className="mt-0.5 size-5 shrink-0 accent-[var(--color-accent)] sm:mt-1 sm:size-4"
         />
         <span>
           I confirm that my answers reflect my actual experience and knowledge, and I agree that they may be used for

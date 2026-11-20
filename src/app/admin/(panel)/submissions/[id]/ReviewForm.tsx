@@ -27,7 +27,7 @@ export function ReviewForm({ id, status, notes }: { id: string; status: string; 
           rows={5}
           maxLength={5000}
           placeholder="Observations, cross-checks with interviews, follow-up questions…"
-          className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15"
+          className="w-full rounded-lg border border-line bg-white px-3 py-2 text-base sm:text-sm text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15"
         />
       </label>
       <div className="flex items-center gap-3">

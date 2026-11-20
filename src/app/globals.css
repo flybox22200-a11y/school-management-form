@@ -39,6 +39,27 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+button,
+label,
+select,
+input[type="checkbox"],
+input[type="radio"],
+a {
+  touch-action: manipulation;
+}
+
+/* iOS Safari renders empty date inputs collapsed and right-aligned. */
+input[type="date"] {
+  min-height: 2.5rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
 }
 
 body {

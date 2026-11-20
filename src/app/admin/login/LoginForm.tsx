@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { login, type LoginState } from "../actions";
 
 const field =
-  "w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-[15px] text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15";
+  "w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-base sm:text-[15px] text-ink shadow-xs focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15";
 
 export function LoginForm({ notice }: { notice?: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, {});

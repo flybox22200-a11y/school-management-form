@@ -16,11 +16,11 @@ export default function Home() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <section className="mx-auto max-w-5xl px-4 pt-12 pb-10 sm:px-6 sm:pt-20">
+        <section className="mx-auto max-w-5xl px-4 pt-10 pb-10 sm:px-6 sm:pt-20">
           <p className="font-mono text-xs font-medium uppercase tracking-[0.16em] text-accent">
             Academic research questionnaire
           </p>
-          <h1 className="mt-3 max-w-3xl font-serif text-[40px] leading-[1.08] tracking-tight text-ink sm:text-6xl">
+          <h1 className="mt-3 max-w-3xl font-serif text-[36px] leading-[1.08] tracking-tight text-ink sm:text-6xl">
             School Management Research
           </h1>
           <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-ink-soft">
@@ -36,7 +36,7 @@ export default function Home() {
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Link
               href="/questionnaire"
-              className="inline-flex items-center gap-2 rounded-xl bg-ink px-7 py-4 text-[16px] font-medium text-white shadow-sm transition hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink/20"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-ink px-7 py-4 text-[16px] font-medium text-white shadow-sm transition hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink/20 active:scale-[0.99] sm:w-auto"
             >
               Start Questionnaire
               <span aria-hidden>→</span>
@@ -100,7 +100,7 @@ export default function Home() {
         <section className="mx-auto max-w-5xl px-4 py-14 text-center sm:px-6">
           <Link
             href="/questionnaire"
-            className="inline-flex items-center gap-2 rounded-xl bg-accent px-7 py-4 text-[16px] font-medium text-white shadow-sm transition hover:bg-accent-ink"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-7 py-4 text-[16px] font-medium text-white shadow-sm transition hover:bg-accent-ink active:scale-[0.99] sm:w-auto"
           >
             Start Questionnaire <span aria-hidden>→</span>
           </Link>

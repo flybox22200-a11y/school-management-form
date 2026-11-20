@@ -204,11 +204,11 @@ function Stat({ label, value, hint, strong }: { label: string; value: number; hi
 }
 
 const control =
-  "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15";
+  "w-full min-w-0 rounded-lg border border-line bg-white px-3 py-2 text-base sm:text-sm text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15";
 
 function FilterBar({ filters }: { filters: Filters }) {
   return (
-    <form method="get" action="/admin" className="mt-6 grid gap-3 rounded-2xl border border-line bg-white p-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto_auto_auto]">
+    <form method="get" action="/admin" className="mt-6 grid grid-cols-2 gap-3 rounded-2xl border border-line bg-white p-4 lg:grid-cols-[1fr_1fr_1fr_1fr_auto_auto_auto]">
       <label className="grid gap-1">
         <span className="text-xs font-medium text-ink-soft">Campus</span>
         <select name="campus" defaultValue={filters.campus ?? ""} className={control}>
@@ -247,8 +247,8 @@ function FilterBar({ filters }: { filters: Filters }) {
         <span className="text-xs font-medium text-ink-soft">To</span>
         <input type="date" name="to" defaultValue={filters.to} className={control} />
       </label>
-      <div className="flex items-end gap-2">
-        <button type="submit" className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90">
+      <div className="col-span-2 flex items-end gap-2 lg:col-span-1">
+        <button type="submit" className="flex-1 rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-white hover:bg-ink/90 lg:flex-none lg:py-2">
           Apply
         </button>
         <Link href="/admin" className="rounded-lg px-3 py-2 text-sm text-ink-soft hover:text-ink">

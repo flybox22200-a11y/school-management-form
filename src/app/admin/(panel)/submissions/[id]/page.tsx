@@ -78,7 +78,7 @@ async function Submission({ params }: { params: PageProps<"/admin/submissions/[i
                       <span className="mr-1.5 font-mono text-xs text-ink-faint">Q{q.number}</span>
                       {q.prompt}
                     </dt>
-                    <dd className="mt-1.5 text-[15px] text-ink">
+                    <dd className="mt-1.5 text-[15px] text-ink [overflow-wrap:anywhere]">
                       <AnswerView q={q} a={answers[q.id]} />
                     </dd>
                   </div>

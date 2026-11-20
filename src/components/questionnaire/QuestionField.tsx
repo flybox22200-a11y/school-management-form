@@ -25,7 +25,8 @@ type Props = {
 };
 
 const inputBase =
-  "w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-[15px] text-ink placeholder:text-ink-faint shadow-xs transition focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15 disabled:bg-paper-2 disabled:text-ink-faint";
+  // text-base (16px) on phones stops iOS Safari from zooming in on focus.
+  "w-full min-w-0 rounded-lg border border-line bg-white px-3.5 py-2.5 text-base sm:text-[15px] text-ink placeholder:text-ink-faint shadow-xs transition focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/15 disabled:bg-paper-2 disabled:text-ink-faint";
 
 export function QuestionField({ question: q, answer, allAnswers, error, onChange }: Props) {
   const uid = useId();
@@ -45,7 +46,8 @@ export function QuestionField({ question: q, answer, allAnswers, error, onChange
       id={`question-${q.id}`}
       aria-invalid={!!error}
       aria-describedby={[q.help ? helpId : "", error ? errId : ""].filter(Boolean).join(" ") || undefined}
-      className={`scroll-mt-28 rounded-2xl border bg-white p-5 sm:p-6 transition ${
+      tabIndex={-1}
+      className={`min-w-0 scroll-mt-24 rounded-2xl border bg-white p-4 outline-none sm:scroll-mt-28 sm:p-6 transition ${
         error ? "border-danger/60 ring-3 ring-danger/10" : "border-line"
       }`}
     >
@@ -98,7 +100,7 @@ export function QuestionField({ question: q, answer, allAnswers, error, onChange
                 type="button"
                 aria-pressed={special === s}
                 onClick={() => toggleSpecial(s)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                className={`rounded-full border px-3.5 py-2 text-sm font-medium transition sm:px-3 sm:py-1 sm:text-xs ${
                   special === s
                     ? "border-ink bg-ink text-white"
                     : "border-line bg-paper text-ink-soft hover:border-ink-faint hover:text-ink"
@@ -194,7 +196,7 @@ function Choice({
 }) {
   return (
     <label
-      className={`flex cursor-pointer items-start gap-3 rounded-xl border px-3.5 py-3 text-[15px] transition ${
+      className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border px-3.5 py-3 text-[15px] transition active:scale-[0.99] ${
         checked
           ? "border-accent bg-accent-soft text-ink"
           : "border-line bg-white text-ink hover:border-ink-faint"
@@ -205,7 +207,7 @@ function Choice({
         name={name}
         checked={checked}
         onChange={onChange}
-        className="mt-0.5 size-4 shrink-0 accent-[var(--color-accent)]"
+        className="mt-0.5 size-5 shrink-0 accent-[var(--color-accent)] sm:size-4"
       />
       <span className="leading-snug">{label}</span>
     </label>
@@ -443,7 +445,7 @@ function RepeaterInput({
             type="button"
             onClick={() => remove(i)}
             disabled={shown.length === 1 && !Object.values(row).some((x) => x.trim())}
-            className="h-10 rounded-lg px-3 text-sm text-ink-soft transition hover:bg-white hover:text-danger disabled:invisible"
+            className="h-10 justify-self-end rounded-lg px-3 text-sm text-ink-soft transition hover:bg-white hover:text-danger disabled:hidden sm:justify-self-auto sm:disabled:invisible sm:disabled:block"
             aria-label={`Line ${i + 1} hatayein`}
           >
             Hatayein
